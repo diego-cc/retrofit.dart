@@ -10,6 +10,7 @@ import 'package:built_collection/built_collection.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:dart_style/dart_style.dart';
 import 'package:dio/dio.dart';
+import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:retrofit/retrofit.dart' as retrofit;
 import 'package:source_gen/source_gen.dart';
 import 'package:tuple/tuple.dart';
@@ -1638,7 +1639,8 @@ ${bodyName.displayName} == null
               : refer(p.displayName)
                   .property('path.split(Platform.pathSeparator).last');
 
-          final uploadFileInfo = refer('$MultipartFile.fromFileSync').call([
+          final uploadFileInfo =
+              refer('$MultipartFileRecreatable.fromFileSync').call([
             refer(p.displayName).property('path')
           ], {
             'filename': fileName,
@@ -1686,7 +1688,7 @@ ${bodyName.displayName} == null
             refer('''
                   MapEntry(
                 '$fieldName',
-                MultipartFile.fromBytes(${p.displayName},
+                MultipartFileRecreatable.fromBytes(${p.displayName},
 
                 filename:${literal(fileName)},
                     $conType
@@ -1721,7 +1723,7 @@ ${bodyName.displayName} == null
                 refer('''
                   ${p.displayName}.map((i) => MapEntry(
                 '$fieldName',
-                MultipartFile.fromBytes(i,
+                MultipartFileRecreatable.fromBytes(i,
                     filename:${literal(fileName)},
                     $conType
                     )))
@@ -1759,7 +1761,7 @@ ${bodyName.displayName} == null
                 refer('''
                   ${p.displayName}.map((i) => MapEntry(
                 '$fieldName',
-                MultipartFile.fromFileSync(i.path,
+                MultipartFileRecreatable.fromFileSync(i.path,
                     filename: i.path.split(Platform.pathSeparator).last,
                     $conType
                     )))
@@ -1770,7 +1772,7 @@ ${bodyName.displayName} == null
               blocks.add(const Code('}'));
             }
           } else if (innerType != null &&
-              _typeChecker(MultipartFile).isExactlyType(innerType)) {
+              _typeChecker(MultipartFileRecreatable).isExactlyType(innerType)) {
             if (p.type.isNullable) {
               blocks.add(Code('if (${p.displayName} != null) {'));
             }
