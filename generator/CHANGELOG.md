@@ -1,8 +1,17 @@
 # Changelog
+## 7.0.1
+
+- Rename `retrofit` to `retrofit_generator` in build.yaml fix for build_runner ^2.4.4
+- Add topics
+
+## 7.0.0
+
+- Fix deprecated warnings with analyzer 5.12.0
+- **[BREAKING CHANGE]** Require Dart >= 2.19 for new analyzer
 
 ## 6.0.0
 
-- [BREAKING CHANGE] Update min Dart sdk to 2.18
+- **[BREAKING CHANGE]** Update min Dart sdk to 2.18
 - Update example
 - Fix link in readme
 

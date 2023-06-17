@@ -19,14 +19,18 @@ const _analyzerIgnores =
     '// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers';
 
 class RetrofitOptions {
-  RetrofitOptions({this.autoCastResponse});
+  RetrofitOptions({this.autoCastResponse, this.emptyRequestBody});
 
   RetrofitOptions.fromOptions([BuilderOptions? options])
       : autoCastResponse =
             (options?.config['auto_cast_response']?.toString() ?? 'true') ==
+                'true',
+        emptyRequestBody =
+            (options?.config['empty_request_body']?.toString() ?? 'false') ==
                 'true';
 
   final bool? autoCastResponse;
+  final bool? emptyRequestBody;
 }
 
 class RetrofitGenerator extends GeneratorForAnnotation<retrofit.RestApi> {
@@ -322,7 +326,7 @@ class RetrofitGenerator extends GeneratorForAnnotation<retrofit.RestApi> {
       return type;
     }
 
-    if (generic.isDynamic) {
+    if (generic is DynamicType) {
       return null;
     }
 
@@ -357,7 +361,9 @@ class RetrofitGenerator extends GeneratorForAnnotation<retrofit.RestApi> {
               (it) => Parameter(
                 (p) => p
                   ..name = it.name
-                  ..named = it.isNamed,
+                  ..named = it.isNamed
+                  ..type =
+                      refer(it.type.getDisplayString(withNullability: true)),
               ),
             ),
       );
@@ -372,6 +378,8 @@ class RetrofitGenerator extends GeneratorForAnnotation<retrofit.RestApi> {
                       !it.hasDefaultValue)
                   ..name = it.name
                   ..named = it.isNamed
+                  ..type =
+                      refer(it.type.getDisplayString(withNullability: true))
                   ..defaultTo = it.defaultValueCode == null
                       ? null
                       : Code(it.defaultValueCode!),
@@ -1867,11 +1875,19 @@ ${bodyName.displayName} == null
     }
 
     /// There is no body
-    blocks.add(
-      declareFinal(dataVar, type: refer('Map<String, dynamic>?'))
-          .assign(literalNull)
-          .statement,
-    );
+    if (globalOptions.emptyRequestBody == true) {
+      blocks.add(
+        declareFinal(dataVar)
+            .assign(literalMap({}, refer('String'), refer('dynamic')))
+            .statement,
+      );
+    } else {
+      blocks.add(
+        declareFinal(dataVar, type: refer('Map<String, dynamic>?'))
+            .assign(literalNull)
+            .statement,
+      );
+    }
   }
 
   Map<String, Expression> _generateHeaders(MethodElement m) {
@@ -2121,7 +2137,7 @@ String revivedLiteral(
     }
 
     if (constant.isSymbol) {
-      return Code('Symbol(${constant.symbolValue.toString()})');
+      return Code('Symbol(${constant.symbolValue})');
       // return literal(constant.symbolValue);
     }
 
