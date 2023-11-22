@@ -84,6 +84,7 @@ class RestApi {
   /// * Endpoint: `foo/bar/`
   /// * Result: `http://example.com/foo/bar/`
   ///
+  /// When you specify a relative [baseUrl]. The [Dio] instance passed to the constructor should have it defined.
   /// When you don't specify the [baseUrl]. The [Dio] instance passed to the constructor should have it defined.
   /// Otherwise the `path` field of any [HttpMethod] like [POST] should have the full URL.
 
@@ -335,4 +336,20 @@ class CacheControl {
   final bool noTransform;
   final bool onlyIfCached;
   final List<String> other;
+}
+
+/// Prevents `null` values from being converted to `absent` values in generated code for body.
+/// ```
+/// @PreventNullToAbsent()
+/// @POST("/post")
+/// Future<String> example(@Field('foo') String? foo);
+/// ```
+/// Here, if `foo` is `null`, the generated code will not convert it to `absent`.
+/// It'll send `null` as the value of `foo`.
+///
+/// It is useful when you want to send `null` as the value to the server.
+/// Such as, when you want to delete a field's value from the database.
+@immutable
+class PreventNullToAbsent {
+  const PreventNullToAbsent();
 }

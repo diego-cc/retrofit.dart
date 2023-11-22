@@ -1,4 +1,39 @@
 # Changelog
+
+## 8.0.2
+
+- fix #630 Null check operator used on a null value
+
+## 8.0.1
+
+- Add option class-name to customize the name of retrofit generator
+
+## 8.0.0
+
+- Add protobuf support
+- Add PreventNullToAbsent annotation to allow null sent to server
+
+## 7.0.8
+
+- Use `toJson()` instead of `.name` if enums have `toJson()`.
+
+## 7.0.7
+
+- Enums return types generated iterating over the enum values instead of calling `.toJson()` method
+- Enums as query parameters generated with `.name` instead of `toJson()`
+
+## 7.0.6
+
+- Fix DateTime.toIso8601String() issue #586
+
+## 7.0.3
+
+- Add support for analyzer 6.0.0
+
+## 7.0.2
+
+- Fixed generation of `DateTime` used as `@Query` parameters (now it is converted to `String` using `toIso8601String`)
+
 ## 7.0.1
 
 - Rename `retrofit` to `retrofit_generator` in build.yaml fix for build_runner ^2.4.4

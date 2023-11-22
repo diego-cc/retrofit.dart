@@ -4,6 +4,8 @@ import 'package:dio/dio.dart' hide Headers;
 import 'package:retrofit/retrofit.dart';
 import 'package:source_gen_test/annotations.dart';
 
+import 'query.pb.dart';
+
 @ShouldGenerate(
   '''
 // ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers
@@ -380,6 +382,88 @@ abstract class StreamReturnType {
   Stream<User> getUser();
 }
 
+enum TestEnum { A, B }
+
+@ShouldGenerate(
+  '''
+    final value = TestEnum.values.firstWhere(
+      (e) => e.name == _result.data,
+      orElse: () => throw ArgumentError(
+        'TestEnum does not contain value \${_result.data}',
+      ),
+    );
+    return value;
+''',
+  contains: true,
+)
+@RestApi()
+abstract class EnumReturnType {
+  @GET('/')
+  Future<TestEnum> getTestEnum();
+}
+
+enum EnumParam {
+  enabled,
+  disabled,
+}
+
+@ShouldGenerate(
+  '''
+    final queryParameters = <String, dynamic>{r'test': status?.name};
+''',
+  contains: true,
+)
+@RestApi()
+abstract class TestQueryParamEnum {
+  @GET('/test')
+  Future<void> getTest(@Query('test') EnumParam? status);
+}
+
+enum FromJsonEnum {
+  a,
+  b,
+  ;
+
+  factory FromJsonEnum.fromJson(Map<String, dynamic> json) => FromJsonEnum.a;
+}
+
+@ShouldGenerate(
+  '''
+    final value = FromJsonEnum.fromJson(_result.data!);
+    return value;
+''',
+  contains: true,
+)
+@RestApi()
+abstract class EnumFromJsonReturnType {
+  @GET('/')
+  Future<FromJsonEnum> getTestEnum();
+}
+
+enum ToJsonEnum {
+  plus(1),
+  minus(-1),
+  ;
+
+  const ToJsonEnum(this.value);
+
+  final int value;
+
+  int toJson() => value;
+}
+
+@ShouldGenerate(
+  '''
+    final queryParameters = <String, dynamic>{r'test': status?.toJson()};
+''',
+  contains: true,
+)
+@RestApi()
+abstract class TestQueryParamEnumToJson {
+  @GET('/test')
+  Future<void> getTest(@Query('test') ToJsonEnum? status);
+}
+
 @ShouldGenerate(
   '''
   Stream<User> getUser() async* {
@@ -556,6 +640,18 @@ class CustomObject {
   CustomObject(this.id);
 
   final String id;
+}
+
+@ShouldGenerate(
+  '''
+    final queryParameters = <String, dynamic>{r'test': date?.toIso8601String()};
+''',
+  contains: true,
+)
+@RestApi()
+abstract class TestQueryParamDateTime {
+  @GET('/test')
+  Future<void> getTest(@Query('test') DateTime? date);
 }
 
 @ShouldGenerate(
@@ -1821,4 +1917,178 @@ abstract class NullableGenericCastFetch {
 abstract class GenericCastFetch {
   @GET('/')
   Future<User> get();
+}
+
+@ShouldGenerate(
+  '''
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+  ''',
+  contains: true,
+)
+@RestApi()
+abstract class CombineBaseUrls {
+  @GET('/')
+  Future<User> get();
+}
+
+@ShouldGenerate(
+  '''final _data = params.writeToBuffer();''',
+  contains: true,
+)
+@ShouldGenerate(
+  '''
+      r'accept':
+          'application/x-protobuf; \${Result.getDefault().info_.qualifiedMessageName == "" ? "" : "messageType=\${Result.getDefault().info_.qualifiedMessageName}"}'
+  ''',
+  contains: true,
+)
+@ShouldGenerate(
+  '''
+      contentType:
+          'application/x-protobuf; \${params.info_.qualifiedMessageName == "" ? "" : "messageType=\${params.info_.qualifiedMessageName}"}\'''',
+  contains: true,
+)
+@ShouldGenerate(
+  '''await compute(Result.fromBuffer, _result.data!);''',
+  contains: true,
+)
+@RestApi()
+abstract class ProtoSupportParserJsonSerializable {
+  @GET('/')
+  Future<Result> get(@Body() Params params);
+}
+
+@ShouldGenerate(
+  '''final _data = params.writeToBuffer();''',
+  contains: true,
+)
+@ShouldGenerate(
+  '''
+      r'accept':
+          'application/x-protobuf; \${Result.getDefault().info_.qualifiedMessageName == "" ? "" : "messageType=\${Result.getDefault().info_.qualifiedMessageName}"}'
+  ''',
+  contains: true,
+)
+@ShouldGenerate(
+  '''
+      contentType:
+          'application/x-protobuf; \${params.info_.qualifiedMessageName == "" ? "" : "messageType=\${params.info_.qualifiedMessageName}"}\'''',
+  contains: true,
+)
+@ShouldGenerate(
+  '''await compute(Result.fromBuffer, _result.data!);''',
+  contains: true,
+)
+@RestApi(parser: Parser.DartJsonMapper)
+abstract class ProtoSupportParserDartJsonMapper {
+  @GET('/')
+  Future<Result> get(@Body() Params params);
+}
+
+@ShouldGenerate(
+  '''final _data = params.writeToBuffer();''',
+  contains: true,
+)
+@ShouldGenerate(
+  '''
+      r'accept':
+          'application/x-protobuf; \${Result.getDefault().info_.qualifiedMessageName == "" ? "" : "messageType=\${Result.getDefault().info_.qualifiedMessageName}"}'
+  ''',
+  contains: true,
+)
+@ShouldGenerate(
+  '''
+      contentType:
+          'application/x-protobuf; \${params.info_.qualifiedMessageName == "" ? "" : "messageType=\${params.info_.qualifiedMessageName}"}\'''',
+  contains: true,
+)
+@ShouldGenerate(
+  '''await compute(Result.fromBuffer, _result.data!);''',
+  contains: true,
+)
+@RestApi(parser: Parser.MapSerializable)
+abstract class ProtoSupportParserMapSerializable {
+  @GET('/')
+  Future<Result> get(@Body() Params params);
+}
+
+@ShouldGenerate(
+  '''final _data = params.writeToBuffer();''',
+  contains: true,
+)
+@ShouldGenerate(
+  '''
+      r'accept':
+          'application/x-protobuf; \${Result.getDefault().info_.qualifiedMessageName == "" ? "" : "messageType=\${Result.getDefault().info_.qualifiedMessageName}"}'
+  ''',
+  contains: true,
+)
+@ShouldGenerate(
+  '''
+      contentType:
+          'application/x-protobuf; \${params.info_.qualifiedMessageName == "" ? "" : "messageType=\${params.info_.qualifiedMessageName}"}\'''',
+  contains: true,
+)
+@ShouldGenerate(
+  '''await compute(Result.fromBuffer, _result.data!);''',
+  contains: true,
+)
+@RestApi(parser: Parser.FlutterCompute)
+abstract class ProtoSupportParserFlutterCompute {
+  @GET('/')
+  Future<Result> get(@Body() Params params);
+}
+
+@ShouldGenerate(
+  '''
+    final _data = FormData.fromMap(body);
+  ''',
+  contains: true,
+)
+@RestApi()
+abstract class MultipartWithMultplePathParams {
+  @MultiPart()
+  @POST('post/{id}/comments/{commentId}')
+  Future<String> multipartBodyWithMultiplePathParameter(
+    @Path("id") String id,
+    @Path("commentId") String commentId,
+    @Part() Map<String, dynamic> body,
+  );
+}
+
+@ShouldGenerate(
+  '''
+    final _data = FormData.fromMap(body);
+  ''',
+  contains: true,
+)
+@RestApi()
+abstract class MultipartWithSinglePathParams {
+  @MultiPart()
+  @POST('post/{id}/comments')
+  Future<String> multipartBodyWithSinglePathParameter(
+    @Path("id") String id,
+    @Part() Map<String, dynamic> body,
+  );
+}
+
+@ShouldGenerate(
+  '''
+    final _data = FormData.fromMap(body);
+  ''',
+  contains: true,
+)
+@RestApi()
+abstract class MultipartWithMultplePathParamsPUT {
+  @MultiPart()
+  @PUT('post/{id}/comments/{commentId}')
+  Future<String> multipartBodyWithMultiplePathParameter(
+    @Path("id") String id,
+    @Path("commentId") String commentId,
+    @Part() Map<String, dynamic> body,
+  );
 }
